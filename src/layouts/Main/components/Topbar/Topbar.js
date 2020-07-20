@@ -7,6 +7,9 @@ import { AppBar, Toolbar, Badge, Hidden, IconButton } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
 import InputIcon from '@material-ui/icons/Input';
+import { withRouter } from 'react-router-dom';
+import { compose } from 'redux';
+import { connect } from 'react-redux';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -27,6 +30,11 @@ const Topbar = props => {
 
   const [notifications] = useState([]);
 
+  const logout = () => {
+    localStorage.removeItem('user_email');
+    props.history.push('/login');
+  }
+
   return (
     <AppBar
       {...rest}
@@ -43,14 +51,14 @@ const Topbar = props => {
         <Hidden mdDown>
           <IconButton color="inherit">
             <Badge
-              badgeContent={notifications.length}
-              color="primary"
-              variant="dot"
+              badgeContent={props.tasksCount}
+              color="secondary"
             >
               <NotificationsIcon />
             </Badge>
           </IconButton>
           <IconButton
+            onClick={logout}
             className={classes.signOutButton}
             color="inherit"
           >
@@ -75,4 +83,12 @@ Topbar.propTypes = {
   onSidebarOpen: PropTypes.func
 };
 
-export default Topbar;
+const mapStateToProps = state => ({
+  tasksCount: state.tasks.tasksCount
+})
+
+
+export default compose(
+  connect(mapStateToProps),
+  withRouter
+)(Topbar);
